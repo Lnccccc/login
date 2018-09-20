@@ -1,11 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth import authenticate,login
-from .form import LoginForn
-
+from .form import LoginForm
+from django.contrib.auth.decorators import login_required
+@login_required
+def dashboard(request):
+    return render(request,'account/dashboard.html',context={'section':'dashboard'})
 def user_login(request):
     if request.method == 'POST':
-        form = LoginForn(request.POST):
+        form = LoginForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
             user = authenticate(username=cd['username'],password=cd['password'])
@@ -15,10 +18,9 @@ def user_login(request):
                     return HttpResponse('Authenticated successfuly')
                 else:
                      return HttpResponse('Disabled account')
-
             else:
                 return HttpResponse('Invalid login')
-        else:
-            form = LoginForn()
-        return render(request,'account/login.html',context={"form":form})
+    else:
+        form = LoginForm()
+    return render(request,'account/login.html',context={"form":form})
     
